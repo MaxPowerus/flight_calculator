@@ -12,7 +12,7 @@ import java.util.List;
 public class FlightCalculator {
   public static void main(String[] args) throws FileNotFoundException {
     FlightCalculator flightCalculator = new FlightCalculator();
-    File file = new File("C:\\workspace\\flight_calculator\\src\\main\\resources\\tickets.json");
+    File file = new File("src/main/resources/tickets.json");
     TicketsReport report = flightCalculator.getTicketReportFromJsonFile(file);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyH:mm");
 
@@ -35,6 +35,10 @@ public class FlightCalculator {
   public TicketsReport getTicketReportFromJsonFile(File file) throws FileNotFoundException {
     Gson gson = new Gson();
     return gson.fromJson(new FileReader(file), TicketsReport.class);
+  }
+
+  public LocalDateTime localDateTimeConverter(String date, String time, DateTimeFormatter formatter){
+    return LocalDateTime.parse(date + time, formatter);
   }
 
 }
