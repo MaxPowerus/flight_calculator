@@ -16,29 +16,28 @@ public class FlightCalculator {
     TicketsReport report = flightCalculator.getTicketReportFromJsonFile(file);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyH:mm");
 
-    List<Ticket> tickets = report.getTickets();
-    for (Ticket ticket : tickets) {
-      LocalDateTime arrival_dateTime =
-          LocalDateTime.parse(ticket.getArrival_date() + ticket.getArrival_time(),
-              formatter);
-      LocalDateTime departure_dateTime =
-          LocalDateTime.parse(ticket.getDeparture_date() + ticket.getDeparture_time(),
-          formatter);
-      long flightDurationInMinutes = ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime);
-      System.out.println(flightDurationInMinutes);
+      report.getTickets().stream()
+              .map(ticket -> flightCalculator.getFlightDuration(ticket, formatter))
+              .forEach(System.out::println);
 
     }
 
 
-  }
+
 
   public TicketsReport getTicketReportFromJsonFile(File file) throws FileNotFoundException {
     Gson gson = new Gson();
     return gson.fromJson(new FileReader(file), TicketsReport.class);
   }
 
-  public LocalDateTime localDateTimeConverter(String date, String time, DateTimeFormatter formatter){
-    return LocalDateTime.parse(date + time, formatter);
+  public long getFlightDuration(Ticket ticket, DateTimeFormatter formatter){
+    LocalDateTime arrival_dateTime =
+            LocalDateTime.parse(ticket.getArrival_date() + ticket.getArrival_time(),
+                    formatter);
+    LocalDateTime departure_dateTime =
+            LocalDateTime.parse(ticket.getDeparture_date() + ticket.getDeparture_time(),
+                    formatter);
+    return ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime);
   }
 
 }
