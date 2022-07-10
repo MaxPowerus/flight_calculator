@@ -7,22 +7,21 @@ import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.NoSuchElementException;
 
 public class FlightCalculator {
   public static void main(String[] args) throws FileNotFoundException {
     FlightCalculator flightCalculator = new FlightCalculator();
     File file = new File("src/main/resources/tickets.json");
+
+
     TicketsReport report = flightCalculator.getTicketReportFromJsonFile(file);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyH:mm");
-
-      report.getTickets().stream()
-              .map(ticket -> flightCalculator.getFlightDuration(ticket, formatter))
-              .forEach(System.out::println);
-
-    }
+    System.out.println(flightCalculator.getAverageFlightTime(report));
 
 
+
+
+  }
 
 
   public TicketsReport getTicketReportFromJsonFile(File file) throws FileNotFoundException {
@@ -30,14 +29,23 @@ public class FlightCalculator {
     return gson.fromJson(new FileReader(file), TicketsReport.class);
   }
 
-  public long getFlightDuration(Ticket ticket, DateTimeFormatter formatter){
+  public long getFlightDuration(Ticket ticket) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyH:mm");
     LocalDateTime arrival_dateTime =
-            LocalDateTime.parse(ticket.getArrival_date() + ticket.getArrival_time(),
-                    formatter);
+        LocalDateTime.parse(ticket.getArrival_date() + ticket.getArrival_time(),
+            formatter);
     LocalDateTime departure_dateTime =
-            LocalDateTime.parse(ticket.getDeparture_date() + ticket.getDeparture_time(),
-                    formatter);
+        LocalDateTime.parse(ticket.getDeparture_date() + ticket.getDeparture_time(),
+            formatter);
+    System.out.println(ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime));
     return ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime);
   }
 
+  public double getAverageFlightTime(TicketsReport report) throws NoSuchElementException {
+    return report.getTickets().stream()
+        .map(this::getFlightDuration)
+        .mapToLong(value -> value)
+        .average()
+        .orElseThrow(NoSuchElementException::new);
+  }
 }
