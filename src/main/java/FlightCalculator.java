@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class FlightCalculator {
   public static void main(String[] args) throws FileNotFoundException {
@@ -22,7 +24,8 @@ public class FlightCalculator {
     System.out.printf("The average flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
         , flightCalculator.getAverageFlightTime(report));
 
-
+    System.out.printf("The 90th percentile flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
+        , flightCalculator.getPercentile(report,90));
 
 
 
@@ -51,6 +54,16 @@ public class FlightCalculator {
         .mapToLong(this::getFlightDuration)
         .average()
         .orElseThrow(NoSuchElementException::new);
+  }
+
+  public double getPercentile(TicketsReport report, int percentile){
+    List<Long> list = report.getTickets()
+        .stream()
+        .map(this::getFlightDuration)
+        .sorted()
+        .collect(Collectors.toList());
+    int index = (int) Math.ceil(percentile / 100.0 * list.size());
+    return list.get(index - 1);
   }
 
 }
