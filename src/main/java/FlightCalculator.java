@@ -1,5 +1,5 @@
-import Model.Ticket;
-import Model.TicketsReport;
+import model.Ticket;
+import model.TicketsReport;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileNotFoundException;
