@@ -12,21 +12,22 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class FlightCalculator {
-  public static void main(String[] args) throws FileNotFoundException {
+  private static final String JSON_FILE_NAME = "src/main/resources/tickets.json";
+
+  public static void main(String[] args) {
     FlightCalculator flightCalculator = new FlightCalculator();
 
-    System.out.println("Reading data from tickets.json...");
-    File file = new File("src/main/resources/tickets.json");
+    try {
+      TicketsReport report = flightCalculator.getTicketReportFromJsonFile(new File(JSON_FILE_NAME));
 
+      System.out.printf("The average flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
+          , flightCalculator.getAverageFlightTime(report));
+      System.out.printf("The 90th percentile flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
+          , flightCalculator.getPercentile(report, 90));
 
-    TicketsReport report = flightCalculator.getTicketReportFromJsonFile(file);
-
-    System.out.printf("The average flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
-        , flightCalculator.getAverageFlightTime(report));
-
-    System.out.printf("The 90th percentile flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
-        , flightCalculator.getPercentile(report,90));
-
+    } catch (FileNotFoundException e) {
+      System.out.println("File not found!");
+    }
 
 
   }
@@ -48,7 +49,7 @@ public class FlightCalculator {
     return ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime);
   }
 
-  public double getAverageFlightTime(TicketsReport report) throws NoSuchElementException {
+  public double getAverageFlightTime(TicketsReport report) {
     return report.getTickets()
         .stream()
         .mapToLong(this::getFlightDuration)
@@ -56,7 +57,7 @@ public class FlightCalculator {
         .orElseThrow(NoSuchElementException::new);
   }
 
-  public double getPercentile(TicketsReport report, int percentile){
+  public double getPercentile(TicketsReport report, int percentile) {
     List<Long> list = report.getTickets()
         .stream()
         .map(this::getFlightDuration)
