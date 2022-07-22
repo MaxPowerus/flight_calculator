@@ -12,11 +12,16 @@ import java.util.NoSuchElementException;
 public class FlightCalculator {
   public static void main(String[] args) throws FileNotFoundException {
     FlightCalculator flightCalculator = new FlightCalculator();
+
+    System.out.println("Reading data from tickets.json...");
     File file = new File("src/main/resources/tickets.json");
 
 
     TicketsReport report = flightCalculator.getTicketReportFromJsonFile(file);
-    System.out.println(flightCalculator.getAverageFlightTime(report));
+
+    System.out.printf("The average flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
+        , flightCalculator.getAverageFlightTime(report));
+
 
 
 
@@ -37,15 +42,15 @@ public class FlightCalculator {
     LocalDateTime departure_dateTime =
         LocalDateTime.parse(ticket.getDeparture_date() + ticket.getDeparture_time(),
             formatter);
-    System.out.println(ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime));
     return ChronoUnit.MINUTES.between(departure_dateTime, arrival_dateTime);
   }
 
   public double getAverageFlightTime(TicketsReport report) throws NoSuchElementException {
-    return report.getTickets().stream()
-        .map(this::getFlightDuration)
-        .mapToLong(value -> value)
+    return report.getTickets()
+        .stream()
+        .mapToLong(this::getFlightDuration)
         .average()
         .orElseThrow(NoSuchElementException::new);
   }
+
 }

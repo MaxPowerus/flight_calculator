@@ -1,3 +1,4 @@
-Программа считывает файл src/main/resources/tickets.json и на его основании рассчитывает и выводит следующую информацию:
-1. Среднее время перелета между городами Владивосток и Тель-Авив
-2. 90й перцентиль времени полета между городами Владивосток и Тель-Авив
+The program reads the src/main/resources/tickets.json file and, based on it, calculates and output the following
+information:
+1. The average flight time between Vladivostok and Tel Aviv.
+2. 90th percentile of flight time between Vladivostok and Tel Aviv.
