@@ -1,5 +1,3 @@
-import model.Ticket;
-import model.TicketsReport;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +8,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import model.Ticket;
+import model.TicketsReport;
 
 public class FlightCalculator {
   private static final String JSON_FILE_NAME = "src/main/resources/tickets.json";
@@ -50,6 +50,9 @@ public class FlightCalculator {
   }
 
   public double getAverageFlightTime(TicketsReport report) {
+    if (report.getTickets().size() == 0) {
+      return 0;
+    }
     return report.getTickets()
         .stream()
         .mapToLong(this::getFlightDuration)
@@ -58,6 +61,9 @@ public class FlightCalculator {
   }
 
   public double getPercentile(TicketsReport report, int percentile) {
+    if (report.getTickets().size() == 0 || percentile == 0) {
+      return 0;
+    }
     List<Long> list = report.getTickets()
         .stream()
         .map(this::getFlightDuration)
