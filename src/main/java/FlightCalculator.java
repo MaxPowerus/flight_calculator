@@ -2,6 +2,8 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -10,23 +12,33 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import model.Ticket;
 import model.TicketsReport;
+import org.apache.commons.io.FileUtils;
+
 
 public class FlightCalculator {
-  private static final String JSON_FILE_NAME = "src/main/resources/tickets.json";
 
   public static void main(String[] args) {
     FlightCalculator flightCalculator = new FlightCalculator();
 
     try {
-      TicketsReport report = flightCalculator.getTicketReportFromJsonFile(new File(JSON_FILE_NAME));
+      InputStream initialStream = flightCalculator.getClass().getClassLoader().getResourceAsStream("tickets.json");
+      File targetFile = new File("targetFile.json");
+      if (initialStream != null) {
+        FileUtils.copyInputStreamToFile(initialStream, targetFile);
+      } else {
+        throw new IOException();
+      }
+
+      TicketsReport report = flightCalculator.getTicketReportFromJsonFile(targetFile);
 
       System.out.printf("The average flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
           , flightCalculator.getAverageFlightTime(report));
       System.out.printf("The 90th percentile flight time between Vladivostok and Tel Aviv: %.0f minutes.%n"
           , flightCalculator.getPercentile(report, 90));
 
-    } catch (FileNotFoundException e) {
-      System.out.println("File not found!");
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+      e.printStackTrace();
     }
 
 
